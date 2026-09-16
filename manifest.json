@@ -1,0 +1,10 @@
+json
+{
+  "name": "Fueling Calculation",
+  "short_name": "Fueling",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f2f4f7",
+  "theme_color": "#17365d",
+  "orientation": "portrait"
+}
