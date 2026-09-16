@@ -1,1 +1,348 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>Fueling Calculation</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    background: #f2f4f7;
+    font-family: Arial, sans-serif;
+    color: #222;
+}
+
+.container {
+    max-width: 700px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+}
+
+h1 {
+    text-align: center;
+    margin: 0 0 20px;
+    background: #17365d;
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 22px;
+}
+
+h2 {
+    font-size: 17px;
+    margin-top: 24px;
+    color: #17365d;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border: 1.5px solid #555;
+    padding: 10px 7px;
+    text-align: center;
+}
+
+th {
+    background: #d9e2f3;
+}
+
+.total-row td {
+    font-weight: bold;
+    border-top: 3px solid #222;
+    border-bottom: 3px solid #222;
+}
+
+input {
+    width: 100%;
+    padding: 9px;
+    font-size: 16px;
+    text-align: center;
+    border: 1.5px solid #555;
+    border-radius: 5px;
+    background: #fff2cc;
+}
+
+.result {
+    background: #d9ead3;
+    font-weight: bold;
+}
+
+.delivery td:first-child {
+    text-align: left;
+    font-weight: bold;
+}
+
+.delivery td:last-child {
+    width: 45%;
+}
+
+button {
+    width: 100%;
+    margin-top: 24px;
+    padding: 13px;
+    font-size: 17px;
+    font-weight: bold;
+    color: white;
+    background: #c00000;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+button:active {
+    background: #8f0000;
+}
+
+.note {
+    margin-top: 12px;
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>FUELING CALCULATION</h1>
+
+<table>
+<thead>
+<tr>
+<th>Tank</th>
+<th>Before</th>
+<th>After</th>
+<th>Difference</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr>
+<td>L</td>
+<td>
+<input id="beforeL"
+type="number"
+min="0"
+step="0.1"
+inputmode="decimal">
+</td>
+
+<td>
+<input id="afterL"
+type="number"
+min="0"
+step="0.1"
+inputmode="decimal">
+</td>
+
+<td id="diffL" class="result">0.0</td>
+</tr>
+
+<tr>
+<td>C</td>
+<td>
+<input id="beforeC"
+type="number"
+min="0"
+step="0.1"
+inputmode="decimal">
+</td>
+
+<td>
+<input id="afterC"
+type="number"
+min="0"
+step="0.1"
+inputmode="decimal">
+</td>
+
+<td id="diffC" class="result">0.0</td>
+</tr>
+
+<tr>
+<td>R</td>
+<td>
+<input id="beforeR"
+type="number"
+min="0"
+step="0.1"
+inputmode="decimal">
+</td>
+
+<td>
+<input id="afterR"
+type="number"
+min="0"
+step="0.1"
+inputmode="decimal">
+</td>
+
+<td id="diffR" class="result">0.0</td>
+</tr>
+
+<tr class="total-row">
+<td>TOTAL</td>
+<td id="totalBefore" class="result">0.0</td>
+<td id="totalAfter" class="result">0.0</td>
+<td id="totalDiff" class="result">0.0</td>
+</tr>
+
+</tbody>
+</table>
+
+<h2>FUEL DELIVERY</h2>
+
+<table class="delivery">
+
+<tr>
+<td>Total Metered Fuel</td>
+<td>
+<input id="meteredFuel"
+type="number"
+min="0"
+step="1"
+inputmode="numeric">
+</td>
+</tr>
+
+<tr>
+<td>Fuel Density</td>
+<td>
+<input id="density"
+type="number"
+min="0"
+step="0.01"
+inputmode="decimal">
+</td>
+</tr>
+
+<tr>
+<td>Total Pounds Added</td>
+<td id="poundsAdded" class="result">0.0</td>
+</tr>
+
+<tr>
+<td>Total Computed Fuel</td>
+<td id="computedFuel" class="result">0.0</td>
+</tr>
+
+</table>
+
+<button onclick="clearAll()">
+CLEAR / NEW CALCULATION
+</button>
+
+<div class="note">
+Yellow cells = Input | Green cells = Automatic calculation
+</div>
+
+</div>
+
+<script>
+
+function value(id) {
+    const v = parseFloat(document.getElementById(id).value);
+    return Number.isFinite(v) ? v : 0;
+}
+
+function round1(number) {
+    return Math.round((number + Number.EPSILON) * 10) / 10;
+}
+
+function calculate() {
+
+    const beforeL = value("beforeL");
+    const afterL = value("afterL");
+
+    const beforeC = value("beforeC");
+    const afterC = value("afterC");
+
+    const beforeR = value("beforeR");
+    const afterR = value("afterR");
+
+    const diffL = afterL - beforeL;
+    const diffC = afterC - beforeC;
+    const diffR = afterR - beforeR;
+
+    const totalBefore =
+        beforeL + beforeC + beforeR;
+
+    const totalAfter =
+        afterL + afterC + afterR;
+
+    const totalDiff =
+        diffL + diffC + diffR;
+
+    const meteredFuel = value("meteredFuel");
+    const density = value("density");
+
+    const poundsAdded =
+        meteredFuel * density / 1000;
+
+    const computedFuel =
+        totalBefore + poundsAdded;
+
+    document.getElementById("diffL").textContent =
+        round1(diffL).toFixed(1);
+
+    document.getElementById("diffC").textContent =
+        round1(diffC).toFixed(1);
+
+    document.getElementById("diffR").textContent =
+        round1(diffR).toFixed(1);
+
+    document.getElementById("totalBefore").textContent =
+        round1(totalBefore).toFixed(1);
+
+    document.getElementById("totalAfter").textContent =
+        round1(totalAfter).toFixed(1);
+
+    document.getElementById("totalDiff").textContent =
+        round1(totalDiff).toFixed(1);
+
+    document.getElementById("poundsAdded").textContent =
+        round1(poundsAdded).toFixed(1);
+
+    document.getElementById("computedFuel").textContent =
+        round1(computedFuel).toFixed(1);
+}
+
+function clearAll() {
+
+    const inputs = document.querySelectorAll("input");
+
+    inputs.forEach(input => {
+        input.value = "";
+    });
+
+    calculate();
+}
+
+document.querySelectorAll("input").forEach(input => {
+    input.addEventListener("input", calculate);
+});
+
+calculate();
+
+</script>
+
+</body>
+</html>
