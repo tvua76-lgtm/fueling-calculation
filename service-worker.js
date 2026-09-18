@@ -1,4 +1,4 @@
-const CACHE_NAME = "fueling-calculation-v1";
+const CACHE_NAME = "fueling-calculation-v2";
 
 const FILES_TO_CACHE = [
     "./",
