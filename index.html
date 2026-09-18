@@ -339,6 +339,8 @@ document.getElementById("convertedDensity").textContent =
     densityUnit === "kgl"
         ? "Converted: " + densityLbGal.toFixed(2) + " lb/gal"
         : "";
+const computedFuel =
+    totalBefore + poundsAdded;
 
     document.getElementById("diffL").textContent =
         round1(diffL).toFixed(1);
