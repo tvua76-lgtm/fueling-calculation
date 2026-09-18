@@ -226,11 +226,38 @@ inputmode="numeric">
 <tr>
 <td>Fuel Density</td>
 <td>
+<div style="display:flex; gap:6px;">
+
 <input id="density"
 type="number"
 min="0"
 step="0.01"
 inputmode="decimal">
+
+<select id="densityUnit"
+style="
+width:110px;
+padding:9px;
+font-size:16px;
+border:1.5px solid #555;
+border-radius:5px;
+background:#fff2cc;
+">
+<option value="lbgal">lb/gal</option>
+<option value="kgl">kg/L</option>
+</select>
+
+</div>
+
+<div id="convertedDensity"
+style="
+margin-top:6px;
+font-size:13px;
+color:#17365d;
+font-weight:bold;
+">
+</div>
+
 </td>
 </tr>
 
@@ -292,13 +319,26 @@ function calculate() {
         diffL + diffC + diffR;
 
     const meteredFuel = value("meteredFuel");
-    const density = value("density");
+const enteredDensity = value("density");
 
-    const poundsAdded =
-        meteredFuel * density / 1000;
+const densityUnit =
+    document.getElementById("densityUnit").value;
 
-    const computedFuel =
-        totalBefore + poundsAdded;
+let densityLbGal;
+
+if (densityUnit === "kgl") {
+    densityLbGal = enteredDensity * 8.3454;
+} else {
+    densityLbGal = enteredDensity;
+}
+
+const poundsAdded =
+    meteredFuel * densityLbGal / 1000;
+
+document.getElementById("convertedDensity").textContent =
+    densityUnit === "kgl"
+        ? "Converted: " + densityLbGal.toFixed(2) + " lb/gal"
+        : "";
 
     document.getElementById("diffL").textContent =
         round1(diffL).toFixed(1);
@@ -339,7 +379,8 @@ function clearAll() {
 document.querySelectorAll("input").forEach(input => {
     input.addEventListener("input", calculate);
 });
-
+document.getElementById("densityUnit")
+    .addEventListener("change", calculate);
 calculate();
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
